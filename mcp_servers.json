@@ -1,12 +1,16 @@
 {
     "mcp_servers": {
       "time": {
-        "command": "uvx",
-        "args": ["mcp-server-time", "--local-timezone=Asia/Shanghai"]
+        "command": "/Users/sakajiritomoyoshi/.pyenv/versions/3.11.13/bin/uvx",
+        "args": ["mcp-server-time", "--local-timezone=Asia/Tokyo"]
       },
       "ddg-search": {
-        "command": "uvx",
+        "command": "/Users/sakajiritomoyoshi/.pyenv/versions/3.11.13/bin/uvx",
         "args": ["duckduckgo-mcp-server"]
+      },
+      "slide-controller": {
+        "command": "/Users/sakajiritomoyoshi/.pyenv/versions/3.11.13/bin/python3",
+        "args": ["/Users/sakajiritomoyoshi/Desktop/git/sandbox-vtuber/slide-server/mcp_slide.py"]
       }
     }
 }
