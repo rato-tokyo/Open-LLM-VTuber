@@ -42,6 +42,53 @@ def init_client_ws_route(default_context_cache: ServiceContext) -> APIRouter:
             await ws_handler.handle_disconnect(client_uid)
             raise
 
+    @router.get("/api/clients")
+    async def list_clients():
+        """List all connected client UIDs."""
+        return JSONResponse(
+            {"clients": list(ws_handler.client_connections.keys())}
+        )
+
+    @router.post("/api/inject-text")
+    async def inject_text(request_data: dict):
+        """Inject text into an existing browser session.
+
+        Body: {"client_uid": "...", "text": "..."}
+        If client_uid is omitted, uses the first connected client.
+        """
+        text = request_data.get("text", "")
+        target_uid = request_data.get("client_uid")
+
+        if not text:
+            return JSONResponse(
+                {"error": "text is required"}, status_code=400
+            )
+
+        # If no target specified, use the first connected client
+        if not target_uid:
+            if not ws_handler.client_connections:
+                return JSONResponse(
+                    {"error": "No connected clients"}, status_code=404
+                )
+            target_uid = next(iter(ws_handler.client_connections))
+
+        if target_uid not in ws_handler.client_connections:
+            return JSONResponse(
+                {"error": f"Client {target_uid} not found"},
+                status_code=404,
+            )
+
+        websocket = ws_handler.client_connections[target_uid]
+        data = {"type": "text-input", "text": text}
+
+        await ws_handler._handle_conversation_trigger(
+            websocket, target_uid, data
+        )
+
+        return JSONResponse(
+            {"status": "ok", "client_uid": target_uid}
+        )
+
     return router
 
 
